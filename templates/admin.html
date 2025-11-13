@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nika Visa AI – Admin Dashboard</title>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f4f6fb;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 3rem auto;
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    h1 {
+      text-align: center;
+      color: #004aad;
+      margin-bottom: 2rem;
+    }
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: #f0f5ff;
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      text-align: center;
+      flex: 1;
+      margin: 0 0.5rem;
+    }
+    .card h2 { margin: 0; color: #004aad; }
+    .card p { margin: 0.5rem 0 0; color: #555; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.8rem;
+      border-bottom: 1px solid #eee;
+    }
+    th { background: #f9fbff; color: #004aad; }
+    tr:hover { background: #f7faff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎛️ Nika Visa AI – Admin Dashboard</h1>
+
+    <div class="stats">
+      <div class="card">
+        <h2>{{ total_users }}</h2>
+        <p>Total Users</p>
+      </div>
+      <div class="card">
+        <h2>{{ free_users }}</h2>
+        <p>Free Users</p>
+      </div>
+      <div class="card">
+        <h2>{{ pro_users }}</h2>
+        <p>Pro Users</p>
+      </div>
+    </div>
+      <div class="card">
+        <h2>{{ bounced }}</h2>
+        <p>Bounced Visitors</p>
+      </div>
+      <div class="card">
+        <h2>{{ converted }}</h2>
+        <p>Converted Visitors</p>
+      </div>
+
+    <h3>👥 Recent Profiles</h3>
+    <table>
+      <tr>
+        <th>Email</th>
+        <th>Tier</th>
+        <th>Turns Today</th>
+        <th>Last Used</th>
+      </tr>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.email }}</td>
+        <td>{{ u.tier }}</td>
+        <td>{{ u.turns_today }}</td>
+        <td>{{ u.last_used }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</body>
+</html>

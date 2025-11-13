@@ -9,6 +9,8 @@ from aiocache import Cache
 from fastapi.responses import RedirectResponse
 from datetime import date
 from auth.routes_supabase import supabase
+from utils import admin_dashboard
+from utils.analytics import track_visit
 
 # ==========================================================
 # 🚀 Initialize FastAPI App FIRST
@@ -29,6 +31,7 @@ from auth.routes_basic import router as basic_auth_router
 from auth.routes_profile import router as profile_router
 from auth.routes_supabase import router as supabase_router
 from auth.routes_upgrade import router as upgrade_router
+from utils.admin_dashboard import router as admin_router
 
 
 # ==========================================================
@@ -38,6 +41,9 @@ app.include_router(basic_auth_router)
 app.include_router(profile_router)
 app.include_router(supabase_router)
 app.include_router(upgrade_router)
+app.include_router(admin_dashboard.router)
+app.include_router(admin_router)
+
 
 
 
@@ -106,7 +112,15 @@ def home(request: Request):
     user_email = request.cookies.get("user_email")
     return templates.TemplateResponse("index.html", {"request": request, "user_email": user_email})
 
+# ==========================================================
+# User Analytics
+# ==========================================================
+from utils.analytics import track_visit
 
+@app.get("/", response_class=HTMLResponse)
+async def homepage(request: Request):
+    await track_visit(request)  # logs anonymous visitor
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 
