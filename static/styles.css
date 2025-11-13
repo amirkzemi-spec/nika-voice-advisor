@@ -1,0 +1,105 @@
+/* General layout */
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: radial-gradient(circle at top right, #0f172a, #1e293b);
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Navigation */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 60px;
+}
+.logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+.logo span {
+  color: #38bdf8;
+}
+.nav-links a {
+  color: #f8fafc;
+  margin-left: 24px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+.nav-links a:hover {
+  color: #38bdf8;
+}
+
+/* Hero content */
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+}
+.hero h1 {
+  font-size: 3.5rem;
+  margin: 0;
+}
+.hero h1 span {
+  color: #38bdf8;
+}
+.hero p {
+  max-width: 650px;
+  font-size: 1.2rem;
+  color: #cbd5e1;
+  margin: 20px auto 40px;
+}
+
+/* Record button */
+#recordBtn {
+  background: linear-gradient(90deg, #0ea5e9, #06b6d4);
+  border: none;
+  border-radius: 50px;
+  color: white;
+  font-size: 1.2rem;
+  padding: 14px 32px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+}
+#recordBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+}
+#recordBtn.recording {
+  background: linear-gradient(90deg, #dc2626, #f87171);
+  box-shadow: 0 0 40px rgba(220, 38, 38, 0.5);
+}
+
+/* Glowing mic animation */
+.mic-glow {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: -35px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #38bdf8;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(0.9) translateY(-50%); opacity: 0.8; }
+  50% { transform: scale(1.3) translateY(-50%); opacity: 0.3; }
+  100% { transform: scale(0.9) translateY(-50%); opacity: 0.8; }
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  nav { padding: 20px 30px; }
+  .hero h1 { font-size: 2.4rem; }
+  .hero p { font-size: 1rem; }
+}

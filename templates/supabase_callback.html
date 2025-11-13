@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Signing you in...</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f9faff;
+    }
+    .box {
+      text-align: center;
+      padding: 2rem;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    h2 { color: #3b5bdb; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Verifying your account...</h2>
+    <p>Please wait a moment ⏳</p>
+  </div>
+
+  <script>
+    // If Supabase redirected with #access_token, convert it to ?access_token=
+    const hash = window.location.hash;
+    if (hash.includes("access_token")) {
+      const params = new URLSearchParams(hash.substring(1));
+      const token = params.get("access_token");
+      if (token) {
+        window.location.replace(`/auth/supabase/callback?access_token=${token}`);
+        setTimeout(() => {
+        window.location.replace("/");
+      }, 1200);
+
+      }
+    }
+  </script>
+</body>
+</html>

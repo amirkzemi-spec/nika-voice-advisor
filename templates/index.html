@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nika Visa AI – Walkie-Talkie Assistant</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    background: radial-gradient(circle at top, #f2f7ff, #dce6ff);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .app-container {
+    width: 95%;
+    max-width: 420px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 24px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    padding: 2rem 1.5rem 5rem;
+    position: relative;
+  }
+
+  h1 { font-size: 1.7rem; color: #004aad; margin-bottom: .3rem; }
+  p.subtitle { color: #555; font-size: .95rem; margin-bottom: 1.2rem; }
+
+  /* ✅ User status + logout */
+  .user-status {
+    font-size: 0.9rem;
+    color: #333;
+    background: #f5f9ff;
+    border: 1px solid #e0e8ff;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .login-btn, .logout-btn {
+    display: inline-block;
+    margin-top: 0.6rem;
+    padding: 0.45rem 1.2rem;
+    border-radius: 8px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+  }
+
+  .login-btn:hover, .logout-btn:hover { background: #0056cc; }
+
+  /* 💎 Upgrade Box */
+  #upgradeBox {
+    display: none;
+    text-align: center;
+    background: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    margin-top: 1.5rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    animation: fadeIn 0.4s ease forwards;
+  }
+  #upgradeBox p { margin: 0.4rem 0; }
+  #upgradeBox a {
+    background: #2563eb;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.2s;
+  }
+  #upgradeBox a:hover { background: #1e4fd1; }
+  @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
+
+  /* 🎤 Floating Mic Button */
+  #recordBtn {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    border: none;
+    border-radius: 50%;
+    width: 90px;
+    height: 90px;
+    background: radial-gradient(circle at 30% 30%, #008cff, #0056d8);
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  #recordBtn:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 12px 30px rgba(0, 123, 255, 0.45);
+  }
+
+  #recordBtn.idle {
+    animation: idleGlow 2.5s ease-in-out infinite;
+  }
+  @keyframes idleGlow {
+    0%,100% { box-shadow: 0 0 15px rgba(0,123,255,0.5); }
+    50% { box-shadow: 0 0 30px rgba(0,123,255,0.7); }
+  }
+
+  #recordBtn.recording {
+    background: linear-gradient(145deg,#ff4b5c,#c1121f);
+    animation: recordPulse 1.3s infinite;
+  }
+  @keyframes recordPulse {
+    0% { transform:translateX(-50%) scale(1); box-shadow:0 0 0 0 rgba(255,0,0,0.6); }
+    70% { transform:translateX(-50%) scale(1.08); box-shadow:0 0 0 18px rgba(255,0,0,0); }
+    100% { transform:translateX(-50%) scale(1); }
+  }
+
+  #status { margin-top: 1rem; font-size: 1rem; color: #333; min-height: 24px; }
+
+  .thinking-ring {
+    width:28px; height:28px; border:3px solid #004aad;
+    border-top-color:transparent; border-radius:50%;
+    animation:spin 1s linear infinite; display:inline-block; margin-top:1rem;
+  }
+  @keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+  #replyAudio { margin-top:1.5rem; width:100%; border-radius:12px; display:none; }
+
+  footer { margin-top:2rem; font-size:0.8rem; color:#777; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <h1>🎙️ Nika Visa AI</h1>
+  <p class="subtitle">Your personal visa & immigration voice assistant</p>
+
+  {% if user_email %}
+    <div class="user-status">
+      ✅ Signed in as <strong>{{ user_email }}</strong><br>
+      <a href="/auth/logout" class="logout-btn">Logout</a>
+    </div>
+  {% else %}
+    <div class="user-status guest">
+      👋 Welcome, guest! You can try 5 free voice questions.<br>
+      <small>🔒 Log in later for unlimited access.</small><br>
+      <a href="/auth/supabase/login" id="loginLink" class="login-btn">Login with Google</a>
+    </div>
+  {% endif %}
+
+  <div id="status">🎧 Tap the mic to speak</div>
+  <div id="loader" style="display:none;"><div class="thinking-ring"></div></div>
+  <audio id="replyAudio" controls></audio>
+
+  <!-- 💎 Upgrade Box (now inside main card) -->
+  <div id="upgradeBox">
+    <p>💎 <strong>Want unlimited daily access?</strong></p>
+    <a href="/upgrade">Upgrade to Pro</a>
+    <p style="font-size:0.85rem; color:#666; margin-top:0.6rem;">
+      or come back tomorrow for more free questions 🌍
+    </p>
+  </div>
+
+  <footer>Made with 💙 by Nika Team</footer>
+</div>
+
+<button id="recordBtn" class="idle"><i class="fa-solid fa-microphone"></i></button>
+
+<script>
+  const recordBtn = document.getElementById("recordBtn");
+  const statusEl = document.getElementById("status");
+  const loader = document.getElementById("loader");
+  const replyAudio = document.getElementById("replyAudio");
+  const upgradeBox = document.getElementById("upgradeBox");
+  let mediaRecorder, audioChunks = [];
+
+  recordBtn.onclick = async () => {
+    if (!mediaRecorder || mediaRecorder.state === "inactive") startRecording();
+    else stopRecording();
+  };
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+      audioChunks = [];
+      mediaRecorder.ondataavailable = e => e.data.size > 0 && audioChunks.push(e.data);
+      mediaRecorder.onstop = async () => { await sendAudio(); };
+      mediaRecorder.start();
+      recordBtn.classList.add("recording");
+      statusEl.textContent = "🎙️ Listening...";
+    } catch {
+      statusEl.textContent = "🚫 Microphone access denied.";
+    }
+  }
+
+  function stopRecording() {
+    if (!mediaRecorder) return;
+    recordBtn.classList.remove("recording");
+    statusEl.textContent = "⏹️ Processing...";
+    mediaRecorder.stop();
+  }
+
+  async function sendAudio() {
+    const blob = new Blob(audioChunks, { type: "audio/webm" });
+    const formData = new FormData();
+    formData.append("file", blob, "voice.webm");
+
+    loader.style.display = "inline-block";
+    recordBtn.disabled = true;
+
+    try {
+      const res = await fetch("/voice-upload", { method: "POST", body: formData });
+
+      if (res.status === 401) {
+        const err = await res.json().catch(() => ({}));
+        loader.style.display = "none";
+
+        if (err.error === "limit_reached") {
+          statusEl.innerHTML = `
+            🔒 <strong>Daily limit reached.</strong><br>
+            ${err.message || "Please come back tomorrow or upgrade to premium."}
+          `;
+          recordBtn.disabled = true;
+          recordBtn.style.opacity = 0.6;
+          upgradeBox.style.display = "block";
+        } else if (err.error === "demo_limit") {
+          statusEl.innerHTML = `🔒 Free demo ended. Please <a href="/auth/supabase/login" style="color:#0056cc;font-weight:500;">log in</a>.`;
+        } else {
+          statusEl.textContent = "⚠️ " + (err.error || "Session expired. Please log in again.");
+        }
+        return;
+      }
+
+      const data = await res.json();
+      loader.style.display = "none";
+      if (data.audio_url) {
+        statusEl.textContent = "🧠 Thinking...";
+        replyAudio.src = data.audio_url + "?t=" + Date.now();
+        replyAudio.style.display = "block";
+        await replyAudio.play();
+        statusEl.textContent = "✅ Ready. You can ask again.";
+      } else {
+        statusEl.textContent = "⚠️ No response from server.";
+      }
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = "⚠️ Connection error.";
+    } finally {
+      recordBtn.disabled = false;
+      loader.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+</html>

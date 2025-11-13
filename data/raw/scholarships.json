@@ -1,0 +1,27 @@
+[
+  {
+    "title": "University of Twente Scholarship",
+    "country": "Netherlands",
+    "degree_level": "Master’s",
+    "min_gpa": 3.0,
+    "deadline": "May 1, 2025",
+    "funding_type": "Partial",
+    "description": "Covers tuition fees up to €12,000 for outstanding students applying for master's programs in the Netherlands."
+  },
+  {
+    "title": "Swiss Excellence Fellowship",
+    "country": "Switzerland",
+    "degree_level": "PhD",
+    "funding_type": "Full",
+    "deadline": "Nov 30, 2025",
+    "description": "Provides full financial support and research supervision for outstanding international scholars."
+  },
+  {
+    "title": "Dutch Startup Visa",
+    "country": "Netherlands",
+    "degree_level": "Entrepreneurship",
+    "funding_type": "Visa Program",
+    "deadline": "Rolling",
+    "description": "An immigration program for entrepreneurs who want to build innovative startups in the Netherlands. Requires facilitator approval and proof of funds."
+  }
+]

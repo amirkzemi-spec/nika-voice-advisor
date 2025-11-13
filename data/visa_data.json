@@ -1,0 +1,62 @@
+[
+  {
+    "country": "Finland",
+    "visa_type": "Student Residence Permit",
+    "requirements": "High-school diploma for bachelor's; bachelor's degree and two years of relevant work experience for master's; proof of English proficiency.",
+    "eligibility": "Non-EU/EEA applicants must pay an application fee.",
+    "duration": "",
+    "fee": "",
+    "benefits": "",
+    "application_link": "https://www.studyinfinland.fi/admissions/bachelors-and-masters-admissions",
+    "source_url": "https://www.studyinfinland.fi/admissions/bachelors-and-masters-admissions",
+    "last_updated": "2025-11-09"
+  },
+  {
+    "country": "Finland",
+    "visa_type": "student residence permit",
+    "requirements": "Proof of sufficient finances and insurance",
+    "eligibility": "Non-EU/EEA students enrolled in English-taught bachelor's and master's programmes",
+    "duration": "",
+    "fee": "€800 - €1000 per month for living expenses; €8,000 - €20,000 per year for tuition",
+    "benefits": "Access to discounts in student restaurants and public transport; eligibility for scholarships",
+    "application_link": "",
+    "source_url": "https://www.studyinfinland.fi/funding-your-studies/fees-and-cost-living",
+    "last_updated": "2025-11-09"
+  },
+  {
+    "country": "Finland",
+    "visa_type": "Bachelor's and Master's Scholarships",
+    "requirements": "Each university has its own scholarship options and application process.",
+    "eligibility": "Non-EU/EEA students",
+    "duration": "",
+    "fee": "",
+    "benefits": "Scholarships and tuition fee waivers may assist you in covering your tuition fees.",
+    "application_link": "https://www.studyinfinland.fi/funding-your-studies/bachelors-and-masters-scholarships",
+    "source_url": "https://www.studyinfinland.fi/funding-your-studies/bachelors-and-masters-scholarships",
+    "last_updated": "2025-11-09"
+  },
+  {
+    "country": "Finland",
+    "visa_type": "Doctoral Funding",
+    "requirements": "Must finance own living expenses; check university departments for funding guidance.",
+    "eligibility": "Doctoral students and researchers.",
+    "duration": "",
+    "fee": "",
+    "benefits": "No tuition fees for doctoral students; access to various funding opportunities.",
+    "application_link": "",
+    "source_url": "https://www.studyinfinland.fi/funding-your-studies/doctoral-funding",
+    "last_updated": "2025-11-09"
+  },
+  {
+    "country": "United Kingdom",
+    "visa_type": "Standard Visitor visa",
+    "requirements": "You must have a passport or travel document that is valid for the whole of your stay in the UK. There must be a blank page in your passport for your Standard Visitor visa. You’ll need to provide details of your travel history, accommodation, and financial means.",
+    "eligibility": "You must meet the eligibility requirements and only do permitted activities. Depending on your nationality, you may not need a visa to visit the UK.",
+    "duration": "6 months for Standard Visitor visa; 11 months for medical reasons; 12 months for academics; maximum of 6 months per visit for long-term visas.",
+    "fee": "£127 for Standard Visitor visa; £220 for medical reasons or academics; £475 for 2-year long-term; £848 for 5-year long-term; £1,059 for 10-year long-term.",
+    "benefits": "Allows you to visit the UK for tourism, business, or family visits. Long-term visas available for frequent visitors.",
+    "application_link": "https://www.gov.uk/standard-visitor/apply-standard-visitor-visa",
+    "source_url": "https://www.gov.uk/standard-visitor/apply-standard-visitor-visa",
+    "last_updated": "2025-11-09"
+  }
+]

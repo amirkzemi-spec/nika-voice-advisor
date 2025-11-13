@@ -1,0 +1,9 @@
+[
+  {"intent": "study_visa", "patterns": ["study visa", "student visa", "university", "admission", "apply to study"]},
+  {"intent": "startup_visa", "patterns": ["startup visa", "innovative business", "facilitator", "RVO", "IND startup"]},
+  {"intent": "work_visa", "patterns": ["work visa", "work permit", "skilled worker", "sponsor", "employment"]},
+  {"intent": "residence_permit", "patterns": ["residence permit", "extend residence", "renew permit", "stay longer", "residence card"]},
+  {"intent": "family_reunion", "patterns": ["family visa", "bring my wife", "spouse visa", "children join", "family reunification"]},
+  {"intent": "embassy_docs", "patterns": ["embassy", "appointment", "biometrics", "submit documents", "interview date"]},
+  {"intent": "unknown", "patterns": []}
+]
