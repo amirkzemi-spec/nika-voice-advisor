@@ -1,13 +1,18 @@
-from fastapi import Request
+# utils/analytics.py
+
+from config import SUPABASE_URL, SUPABASE_KEY
 from supabase import create_client
-import os
 
-async def track_visit(request: Request, status="guest"):
+# ---------------------------------------
+# 🔌 Create Supabase client (shared)
+# ---------------------------------------
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# ---------------------------------------
+# 📊 Track Visitor
+# ---------------------------------------
+async def track_visit(request, status="guest"):
     try:
-        SUPABASE_URL = os.getenv("SUPABASE_URL")
-        SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
         ip = request.client.host
         ua = request.headers.get("user-agent", "unknown")
 
