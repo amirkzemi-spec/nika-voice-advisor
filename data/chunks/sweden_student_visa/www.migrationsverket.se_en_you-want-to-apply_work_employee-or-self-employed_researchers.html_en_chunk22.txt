@@ -1,0 +1,5 @@
+In your application, you indicate which Swedish embassy or consulate-general you want to visit to present your passport.
+Waiting time before we start examining the application Now follows a period of waiting until the Swedish Migration Agency takes a closer look at your application.
+The Swedish Migration Agency processes the application The Swedish Migration Agency will review all the information about your application and determine whether you can be granted a residence permit.
+If we can immediately see that you do not meet the requirements for a residence permit, we may decide to reject your application.
+We will contact you if we need more information.

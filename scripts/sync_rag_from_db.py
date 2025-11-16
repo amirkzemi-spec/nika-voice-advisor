@@ -1,117 +1,138 @@
-import os
-import sys
-import sqlite3
-import faiss
+# nika_voice_ai/scripts/sync_rag_from_db.py
+
+import json
 import numpy as np
 from pathlib import Path
-from openai import OpenAI
-from dotenv import load_dotenv
+from nika_voice_ai.utils.openai_client import client
+import faiss
 
-# -----------------------------
-# 🧭 Path setup (to import properly)
-# -----------------------------
-ROOT_DIR = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT_DIR))
+# -------------------------------------------------------
+# Paths
+# -------------------------------------------------------
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-# -----------------------------
-# 🔐 Environment setup
-# -----------------------------
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+DB_JSON = PROJECT_ROOT / "data" / "db" / "records.json"
+CHUNK_DIR = PROJECT_ROOT / "data" / "chunks"
 
-# -----------------------------
-# 📦 Paths
-# -----------------------------
-DB_PATH = ROOT_DIR / "db" / "nika_data.db"
-PROCESSED_DIR = ROOT_DIR / "data" / "processed"
-RAW_MERGED_TXT = PROCESSED_DIR / "all_knowledge_from_raw.txt"
-FINAL_MERGED_TXT = PROCESSED_DIR / "all_knowledge.txt"
-INDEX_PATH = ROOT_DIR / "rag" / "nika_index.faiss"
+OUTPUT_FAISS = PROJECT_ROOT / "rag" / "nika_index.faiss"
+OUTPUT_TXT = PROJECT_ROOT / "data" / "processed" / "all_knowledge.txt"
 
-# -----------------------------
-# 🧠 Helper: Get embedding
-# -----------------------------
-def get_embedding(text: str) -> np.ndarray:
-    """Generate a text embedding vector."""
-    response = client.embeddings.create(
-        model="text-embedding-3-large",
-        input=[text]
+OUTPUT_FAISS.parent.mkdir(parents=True, exist_ok=True)
+OUTPUT_TXT.parent.mkdir(parents=True, exist_ok=True)
+
+
+# -------------------------------------------------------
+# Embedding Helper
+# -------------------------------------------------------
+async def embed(texts: list[str]):
+    """Generate embeddings from OpenAI safely."""
+    if not texts:
+        return []
+
+    # OpenAI requires strict list[str]
+    cleaned = [str(t).strip() for t in texts if isinstance(t, str) and t.strip()]
+
+    if not cleaned:
+        print("⚠️ No valid text entries to embed.")
+        return []
+
+    response = await client.embeddings.create(
+        model="text-embedding-3-small",
+        input=cleaned
     )
-    return np.array(response.data[0].embedding, dtype="float32")
 
-# -----------------------------
-# 🧱 Build unified dataset
-# -----------------------------
-def build_unified_dataset():
-    entries = []
+    return [item.embedding for item in response.data]
 
-    # 1️⃣ Add DB entries
-    if DB_PATH.exists():
-        conn = sqlite3.connect(DB_PATH)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT country, visa_type, requirements, eligibility, duration, fee, benefits
-            FROM visa_programs
-        """)
-        rows = cur.fetchall()
-        conn.close()
 
-        for row in rows:
-            text = " | ".join([str(x) for x in row if x])
-            entries.append(text)
-        print(f"✅ Loaded {len(rows)} records from database.")
+# -------------------------------------------------------
+# Load Chunked Text
+# -------------------------------------------------------
+def load_chunks() -> list[str]:
+    texts = []
 
-    else:
-        print("⚠️ Database not found — skipping DB part.")
+    if not CHUNK_DIR.exists():
+        print("⚠️ No chunk directory found:", CHUNK_DIR)
+        return []
 
-    # 2️⃣ Add processed raw knowledge
-    if RAW_MERGED_TXT.exists():
-        raw_text = RAW_MERGED_TXT.read_text(encoding="utf-8").strip()
-        paragraphs = [p.strip() for p in raw_text.split("\n") if len(p.strip()) > 50]
-        entries.extend(paragraphs)
-        print(f"✅ Loaded {len(paragraphs)} paragraphs from processed documents.")
-    else:
-        print("⚠️ No processed text file found — skipping document part.")
+    for folder in CHUNK_DIR.iterdir():
+        if not folder.is_dir():
+            continue
 
-    # Deduplicate entries
-    entries = list(dict.fromkeys(entries))
-    print(f"📚 Total combined entries: {len(entries)}")
-    return entries
+        for file in folder.glob("*.txt"):
+            try:
+                content = file.read_text(encoding="utf-8", errors="ignore").strip()
+                if content:
+                    texts.append(content)
+            except Exception as e:
+                print(f"❌ Error reading chunk {file}: {e}")
 
-# -----------------------------
-# 🔄 Build FAISS index
-# -----------------------------
-def sync_rag_unified():
-    all_entries = build_unified_dataset()
-    if not all_entries:
-        print("❌ No data found to index.")
+    return texts
+
+
+# -------------------------------------------------------
+# Load DB JSON Records
+# -------------------------------------------------------
+def load_database_records() -> list[str]:
+    if not DB_JSON.exists():
+        return []
+
+    try:
+        data = json.loads(DB_JSON.read_text())
+        return [d.get("text", "").strip() for d in data if isinstance(d, dict)]
+    except Exception as e:
+        print("❌ JSON load error:", e)
+        return []
+
+
+# -------------------------------------------------------
+# Save Plaintext Debug Dump
+# -------------------------------------------------------
+def save_plaintext(texts: list[str]):
+    merged = "\n\n".join(texts)
+    OUTPUT_TXT.write_text(merged, encoding="utf-8")
+
+
+# -------------------------------------------------------
+# Main FAISS Builder
+# -------------------------------------------------------
+def run():
+    import asyncio
+
+    print("🧠 Loading text & DB records...")
+
+    db_records = load_database_records()
+    chunks = load_chunks()
+
+    # Combine & clean
+    all_texts = [t for t in (db_records + chunks) if isinstance(t, str) and t.strip()]
+
+    print(f"📦 Total data entries: {len(all_texts)}")
+
+    if not all_texts:
+        print("⚠️ No data found — FAISS index not updated.")
         return
 
-    vectors = []
-    print(f"🔍 Generating {len(all_entries)} embeddings...")
-    for text in all_entries:
-        emb = get_embedding(text)
-        vectors.append(emb)
+    async def build():
+        print("🔍 Generating embeddings...")
+        vectors = await embed(all_texts)
 
-    # Build FAISS index
-    dim = len(vectors[0])
-    index = faiss.IndexFlatL2(dim)
-    index.add(np.array(vectors))
+        if not vectors:
+            print("❌ No embeddings returned — aborting.")
+            return
 
-    # Save FAISS index
-    os.makedirs(INDEX_PATH.parent, exist_ok=True)
-    faiss.write_index(index, str(INDEX_PATH))
+        dim = len(vectors[0])
+        index = faiss.IndexFlatL2(dim)
 
-    # Save merged text
-    os.makedirs(PROCESSED_DIR, exist_ok=True)
-    FINAL_MERGED_TXT.write_text("\n".join(all_entries), encoding="utf-8")
+        index.add(np.array(vectors).astype("float32"))
 
-    print(f"✅ Unified FAISS index built successfully!")
-    print(f"📦 Index saved to: {INDEX_PATH}")
-    print(f"🗂️  Text data saved to: {FINAL_MERGED_TXT}")
+        faiss.write_index(index, str(OUTPUT_FAISS))
+        save_plaintext(all_texts)
 
-# -----------------------------
-# 🚀 Run script
-# -----------------------------
+        print("📦 FAISS index saved:", OUTPUT_FAISS)
+        print("🗂️  Text dump saved:", OUTPUT_TXT)
+
+    asyncio.run(build())
+
+
 if __name__ == "__main__":
-    sync_rag_unified()
+    run()

@@ -1,0 +1,4 @@
+If the currency that you wish to rely on is either in Iranian Rials or Syrian Pounds, please refer to the Financial requirement casework guidance for the alternative arrangements that you will be required to use instead of OANDA.
+You cannot use mini-statements obtained from an ATM.
+The format requirements for a bank statement (either printed or online), and a letter from your bank or other financial institution can be found in the Financial requirement casework guidance .
+Please note that the requirement for online statements to either be stamped on each page or to be accompanied by a supporting letter from the bank or building society has been removed.

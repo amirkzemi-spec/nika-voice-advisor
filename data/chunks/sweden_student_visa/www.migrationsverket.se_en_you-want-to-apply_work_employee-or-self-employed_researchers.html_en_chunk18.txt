@@ -1,0 +1,3 @@
+There are many things that affect the waiting time, for example whether your application is complete to begin with or whether we need to request more information, or whether we need to check with other authorities when investigating your case.
+Here we show statistics on how long it has taken for people who have applied for the same permit as you.
+The statistics are based on cases decided in the last 12 months.
